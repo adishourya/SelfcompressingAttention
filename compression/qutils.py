@@ -23,4 +23,20 @@ def inspect_qconv_weights(out,layer):
     plt.imshow(out_plot,cmap="Blues")
     plt.show()
     return out_plot,kernel_plot
+
+
+def quant_spec(x,b=-8.0,e=2.0):
+    """
+    # this is just a spec function..
+    # register a method for quantization for each module. just to be safe
+    """
+    b = torch.as_tensor(b)
+    e = torch.as_tensor(e)
+
+    b = torch.relu(b)
+    x_upscaled = x/torch.exp2(e)
+    half = torch.exp2(b -1)
+    x_clipped = torch.clip(x_upscaled,-1*half,half-1)
+    x_round = torch.steRound(x_clipped)
+    return torch.exp2(e) * x_round
    
